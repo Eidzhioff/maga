@@ -18,7 +18,7 @@ public class Polygon implements Figure{
         for (int i = 0; i < vertices.length; i++){
             Point p1 = vertices[i];
             Point p2 = vertices[(i + 1) % (vertices.length)];
-            perimeter += p1.x() * p2.y() - p2.x() * p1.y();
+            perimeter += Math.sqrt(Math.pow(p2.x() - p1.x(),2) + Math.pow(p2.y() - p1.y(),2));
         }
         return perimeter;
     }
