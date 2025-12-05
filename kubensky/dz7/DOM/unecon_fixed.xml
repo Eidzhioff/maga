@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<university name="СПбГЭУ">
+        
+    <faculty name="Финансово-экономический">
+                
+        <department name="Прикладная математика и информатика">
+                        
+            <course number="1">
+                                
+                <subject hours="144" name="Математический анализ"/>
+                                
+                <subject hours="108" name="Программирование"/>
+                            
+            </course>
+                        
+            <course number="2">
+                                
+                <subject hours="100" name="Алгебра"/>
+                                
+                <subject hours="100" name="Основы Java"/>
+                            
+            </course>
+                    
+        </department>
+            
+    </faculty>
+        
+    <!-- другие факультеты могут присутствовать -->
+    
+</university>
