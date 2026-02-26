@@ -1,0 +1,157 @@
+\documentclass[11pt,russian]{amsart}
+\pagenumbering{gobble}
+
+% ========= PACKAGES ==========
+
+% Common packages
+\usepackage[russian]{babel}
+\usepackage[T1,T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+
+% Text
+\usepackage{advdate}
+\usepackage{enumitem}
+\usepackage{hyphenat}
+\usepackage{hyperref}
+
+% Coloring
+\usepackage[table,svgnames]{xcolor}
+\usepackage{minted}
+
+% Math packages
+\usepackage{amsmath,amssymb,amsthm}
+
+% Algorithm
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\floatname{algorithm}{Алгоритм}
+\MakeRobust{\Call}
+
+% Style settings
+\makeatletter
+\AddEnumerateCounter{\asbuk}{\russian@alph}{щ}
+\makeatother
+
+% Page offsets and alignments
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm,bindingoffset=0cm]{geometry}
+\renewcommand{\baselinestretch}{1.15}
+\setlist{leftmargin=*, align=left}
+
+\newcommand{\DeadlineDate}{Сдать до: 18:30 05.03.2026}
+
+\makeatletter
+\renewcommand\@maketitle{%
+	\newpage
+	\begin{center}
+		{\Large \@title \par}
+		\vskip 0.5em
+		{\DeadlineDate}
+	\end{center}%
+	\par
+	\vskip 1em}
+\makeatother
+
+% Macro for shortcuts.
+\newcommand{\I}{\mathbb{I}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\1}{\mathbb{1}}
+
+% =============================
+\begin{document}
+
+	\textit{Примечание 1: позиции массива размера $n$ индексируются от $0$ до $n-1$ включительно.}
+	
+	\textit{Примечание 2: диапазон <<$x..y$>> включает в себя граничные числа $\{x, x+1, ..., y\}$. Если $x > y$, то диапазон $x..y$ перечисляется по убыванию $\{x, x - 1, ..., y\}$}
+
+	\vspace{.25\baselineskip}
+	\begin{enumerate}[label={\arabic*.}]
+		\item Для приведённого ниже алгоритма, где $a$ это массив содержащий $n$ чисел
+		\begin{enumerate}
+			\item (0.5 балла) выразите $T(n)$ -- вычислительную сложность алгоритма в RA-модели. Оцените порядок роста времени работы алгоритма асимтотически.			
+			\item (0.5 балла) что осуществляет данный алгоритм? Докажите, что он делает <<это>> корректно для любого входного массива. \textit{Указание: опишите и докажите инвариант внешнего цикла.}
+			\item (1 балл) для любого $n$ постройте перестановку массива первых $n$ натуральных чисел, на которой приведённый алгоритм во всех итерациях внешнего цикла совершает хотя бы один <<swap>>. Сколько всего таких перестановок существует? Почему других нет?
+		\end{enumerate}
+		
+		\begin{algorithm}[H]
+			\label{alg:bubble_sort}
+			\begin{algorithmic}[1]
+				\For{$i=(n-1)..1$}
+				\For{$j=(n-1)..1$}
+				\If{$a[j-1] < a[j]$}
+				\State swap($a[j-1], a[j]$)
+				\EndIf
+				\EndFor
+				\EndFor
+			\end{algorithmic}
+		\end{algorithm}%
+		
+		\textbf{Решение:}
+		
+		a) T(n)? Это же не рекурсивный алгоритм (в презентациях T(n) обозначалась мастер – задача для рекурсивных алгоритмов). Поэтому просто вычислилю сложность алгоритма:
+		
+		\[(n - 1) + (n - 1) + \dots + (n - 1) = (n - 1)^2 \Rightarrow O(n^2)\]
+		
+		b) Данный алгоритм осуществляет обычную сортировку пузырьком, но по убыванию.
+		
+		Опять-таки, сортировка пузырьком была в презентации, но так как там она была обычная, то в корректности стоит «суффикс» в нашем же случае должен быть «префикс»
+		
+		Корректность алгоритма следует из того, что на каждой итерации упорядоченный префикс растет хотя бы на один элемент
+		
+		c) Если мы хотим, чтобы перестановки были во всех итерациях внешнего цикла, то надо взять отсортированный массив по возрастанию.
+		
+		Пример на Python:
+		
+		\begin{verbatim}
+		def inv_bubble_sort(arr):
+			n = len(arr)
+			swap_count = 0
+			for i in range(n - 1, 0, -1):
+				for j in range(n - 1, 0, -1):
+					if arr[j - 1] < arr[j]:
+						swap_count += 1
+						arr[j - 1], arr[j] = arr[j], arr[j - 1]
+			return arr, swap_count
+
+		arr = [1, 2, 3, 4, 5]
+		arr, c = inv_bubble_sort(arr)
+		arr, c  # >> ([5, 4, 3, 2, 1], 10)
+		\end{verbatim}
+				
+		Всего таких перестановок может быть $\frac{n(n-1)}{2}$ 
+		\begin{verbatim}
+			(len(arr)*(len(arr)-1))/2 
+			>> 10.0
+		\end{verbatim}
+		
+		Других не может быть потому, что это максимальное возможное число перестановок. Если брать другой массив, то их просто на просто станет меньше
+		
+%		\textbf{Решение:} ...
+		
+		\item (1 балл) Пусть $p(n) = \sum\limits_{i=0}^{d} a_i n^i$ полином степени $d$ от $n$, в котором все коэффициенты $a_i > 0$.\\ Для фиксированной константы $k \in \N$ докажите следующие утверждения:
+		
+		\begin{enumerate}
+			\item Если $k \geq d$, то $p(n) = O(n^k)$
+			\item Если $k = d$, то $p(n) = \Theta(n^k)$
+			\item Если $k \leq d$, то $p(n) = \Omega(n^k)$
+		\end{enumerate}
+		
+		\textit{Указание: воспользуйтесь определениями $O$, $\Omega$, $\Theta$}
+
+%		\textbf{Решение:} ...
+
+		\item (1 балл) Докажите, что $\log n! = \Theta(n\log n)$ для любой базы логарифма.
+
+		\textit{Указание: найдите такие константы $C_1, C_2 > 0$, и $n_0 \in \N$, что $\forall n > n_0$ выполняется:}
+		$$C_1\cdot n\log n \leq \log n! \leq C_2\cdot n\log n$$
+		
+		\textbf{Решение:}
+
+		\[n! = n \cdot (n-1)! \quad\text{для } n = 1,2,3,\dots \Rightarrow n! = n^2\]
+		Следовательно, получается выражение:
+		$$\log n! \leq C_2\cdot \log n^n \Rightarrow C_2 = 1$$
+	\end{enumerate}
+
+\end{document}
