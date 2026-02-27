@@ -152,6 +152,20 @@
 		\[n! = n \cdot (n-1)! \quad\text{для } n = 1,2,3,\dots \Rightarrow n! \leq n^2\]
 		Следовательно, получается выражение:
 		$$\log n! \leq C_2\cdot \log n^n \Rightarrow C_2 = 1$$
+		
+		Рассмотрим $\frac{n}{2}$ множетелей: $(\frac{n}{2} + 1) \cdot (\frac{n}{2} + 2) \dots\geq (\frac{n}{2})^\frac{n}{2}$
+		$\Rightarrow$  необходимо, чтобы выполнялось $\log n! \geq \log ((\frac{n}{2})^\frac{n}{2}$)
+		$$\log ((\frac{n}{2})^\frac{n}{2}) = \frac{n}{2} \log \frac{n}{2} = \frac{n}{2} \log n - \frac{n}{2} \log 2 = \frac{n}{2} \log n (1 - \frac{\log 2}{\log n})$$
+		$$\log n! \geq \frac{n}{2} \log n (1 - \frac{\log 2}{\log n})$$
+
+		\fbox{\begin{minipage}{0.9\textwidth}
+			Найдем $n$:
+			$$(1 - \frac{\log 2}{\log n}) \geq \frac{1}{2}$$
+			$$\log n \geq 2\log 2 = \log 4$$
+			$$\Rightarrow n \geq 4$$
+		\end{minipage}}
+		$$\log n! \geq \frac{1}{4} n\log n$$
+		Получается: $C_1 = \frac{1}{4}$, $C_2 = 1$, $n = 4$
 	\end{enumerate}
 
 \end{document}
