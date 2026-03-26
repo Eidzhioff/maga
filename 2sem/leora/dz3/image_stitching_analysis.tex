@@ -1,0 +1,182 @@
+\documentclass[a4paper,14pt]{extarticle}
+\usepackage[utf8]{inputenc}
+\usepackage[T2A]{fontenc}
+\usepackage[russian]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{tabularx}
+
+\geometry{left=2cm, right=2cm, top=2cm, bottom=2cm}
+
+% Настройка оформления кода
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=4,
+    language=Python
+}
+
+\lstset{style=mystyle}
+
+\title{\textbf{Аналитическая справка} \\ по файлу \texttt{image\_stitching.ipynb}}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section{Назначение}
+Jupyter-ноутбук посвящён \textbf{сшивке двух изображений} (image stitching) с использованием библиотеки OpenCV.
+
+\section{Структура и основные этапы}
+
+\subsection{Импорт библиотек (ячейка 1)}
+\begin{lstlisting}
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+\end{lstlisting}
+
+\subsection{Функция \texttt{stitch\_images} (ячейка 2)}
+Реализует алгоритм сшивки двух изображений:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Шаг} & \textbf{Описание} \\
+\hline
+Конвертация в оттенки серого & \texttt{cv2.cvtColor(..., COLOR\_BGR2GRAY)} \\
+\hline
+Детекция особенностей & SIFT (\texttt{cv2.SIFT\_create()}) — нахождение ключевых точек и дескрипторов \\
+\hline
+Сопоставление дескрипторов & \texttt{cv2.BFMatcher()} + \texttt{knnMatch(k=2)} \\
+\hline
+Фильтрация хороших совпадений & Тест Лоу (отношение расстояний $< 0.75$) \\
+\hline
+Вычисление гомографии & \texttt{cv2.findHomography(..., cv2.RANSAC, 5.0)} — оценка матрицы преобразования \\
+\hline
+Варпирование и сшивка & \texttt{cv2.warpPerspective()} + наложение второго изображения \\
+\hline
+\end{tabular}
+\caption{Этапы алгоритма сшивки изображений}
+\end{table}
+
+\textbf{Возвращает:} сшитое изображение и матрицу гомографии $H$.
+
+\subsection{Загрузка изображений (ячейка 3)}
+\begin{lstlisting}
+img1 = cv2.imread('k1.jpg')
+img2 = cv2.imread('k2.jpg')
+\end{lstlisting}
+
+\subsection{Выполнение сшивки (ячейка 4)}
+\begin{lstlisting}
+result, homography_matrix = stitch_images(img1, img2)
+\end{lstlisting}
+
+\subsection{Визуализация результата (ячейка 5)}
+Отображение сшитого панорамного изображения через \texttt{matplotlib.pyplot.imshow()}.
+
+\section{Используемые изображения}
+\begin{itemize}
+    \item \texttt{k1.jpg}, \texttt{k2.jpg} — исходные кадры для сшивки (присутствуют в директории проекта)
+\end{itemize}
+
+\section{Ключевые алгоритмы и методы}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Метод} & \textbf{Назначение} \\
+\hline
+SIFT & Инвариантное к масштабу и повороту детектирование особенностей \\
+\hline
+BFMatcher + k=2 & Поиск ближайших соседей среди дескрипторов \\
+\hline
+Lowe's ratio test (0.75) & Отсев ненадёжных совпадений \\
+\hline
+RANSAC & Робастная оценка матрицы гомографии с отбрасыванием выбросов \\
+\hline
+warpPerspective & Проективное преобразование первого изображения \\
+\hline
+\end{tabular}
+\caption{Основные алгоритмы и методы}
+\end{table}
+
+\section{Математическое описание}
+
+\subsection{Гомография}
+Матрица гомографии $H$ размером $3 \times 3$ описывает проективное преобразование между двумя плоскостями:
+
+\begin{equation}
+\begin{bmatrix}
+x' \\
+y' \\
+1
+\end{bmatrix}
+\sim
+H
+\begin{bmatrix}
+x \\
+y \\
+1
+\end{bmatrix}
+=
+\begin{bmatrix}
+h_{11} & h_{12} & h_{13} \\
+h_{21} & h_{22} & h_{23} \\
+h_{31} & h_{32} & h_{33}
+\end{bmatrix}
+\begin{bmatrix}
+x \\
+y \\
+1
+\end{bmatrix}
+\end{equation}
+
+где $(x, y)$ — координаты точки на первом изображении, $(x', y')$ — соответствующие координаты на втором изображении.
+
+\subsection{Тест Лоу}
+Для фильтрации совпадений используется отношение расстояний до ближайшего и второго ближайшего соседа:
+
+\begin{equation}
+\frac{d_1}{d_2} < 0.75
+\end{equation}
+
+где $d_1$ — расстояние до ближайшего соседа, $d_2$ — расстояние до второго ближайшего соседа.
+
+\section{Примечания}
+\begin{itemize}
+    \item Код использует \textbf{эвристику 0.75} для фильтрации матчей (стандартное значение из статьи Lowe)
+    \item Гомография применяется только к первому изображению; второе просто копируется в левую часть результата
+    \item Возможны артефакты на границе из-за простого наложения без блендинга
+\end{itemize}
+
+\end{document}
